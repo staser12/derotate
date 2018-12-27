@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import re
+import sys
 from subprocess import Popen, PIPE, call
 
 curDir = os.getcwd()
@@ -31,7 +32,22 @@ for root, dirs, files in os.walk("."):
 				except Exception, e:
 					print str(e)
 					
-		print "files processed: " + str(files_processed)
+		sys.stdout.write('\rScanned: ' + str(files_processed) + '/' + str(len(files)))
+		sys.stdout.flush() 
+		
 
+print "\n"
 print "================================= REPORT: ==================================="
 print('\n'.join(files_to_derotate)) 
+
+print('Starting derotation...')
+
+files_processed = 0
+for filename in files_to_derotate:
+	p = Popen(["exiftool.exe", "-Orientation=1", "-n", filename], stdin=PIPE, stdout=PIPE)	
+	out, err = p.communicate(input='\n')
+	sys.stdout.write('\rProcessed: ' + str(files_processed) + '/' + str(len(files_to_derotate)))
+	sys.stdout.flush() 
+	files_processed += 1
+print('n')		
+print('Completed!')
